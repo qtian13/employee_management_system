@@ -27,3 +27,26 @@ db.query('SELECT * FROM department', function (err, results) {
       console.log(row.name);
   })
 });
+
+db.query('SELECT * FROM role', function (err, results) {
+    if (err) throw err;
+  
+    Object.keys(results).forEach(key => {
+        let row = results[key];
+        console.log(row.id);
+        console.log(row.title);
+        console.log(row.salary);
+        console.log(row.department_id);
+    })
+});
+
+db.query('SELECT * FROM employee', function (err, results) {
+    if (err) throw err;
+  
+    Object.keys(results).forEach(key => {
+        let row = results[key];
+        console.log(row.id);
+        console.log(row.first_name + " " + row.last_name);
+        console.log(row.manager_id);
+    })
+});
