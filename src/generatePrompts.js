@@ -1,4 +1,8 @@
+
 const inquirer = require('inquirer');
+const {displayEmployee} = require('./display');
+const db = require('./connectDB');
+const { throwError } = require('rxjs');
 
 const options = ['View All Employees', 
                 'View All Employees By Department', 
@@ -25,17 +29,22 @@ const promptQuestions = () => {
             {
                 type: 'list',
                 message: 'What would you like to do?',
-                options: options,
+                choices: options,
                 name: 'todo'
             }
         ])
         .then(answer => {
             switch (answer.todo) {
                 case 'View All Employees':
-                    display(getAllEmployees());
+                    db.query('SELECT * FROM employee', function (err, results) {
+                        if (err) throw err;
+                        displayEmployee(results);
+                    });
                     break;
                 default:
                     console.log('No idea how to do it');
             }
         })
-}
+};
+
+module.exports = promptQuestions;
