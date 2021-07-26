@@ -73,6 +73,16 @@ const questionsToAddRecord = (tableName) => {
         });
 }
 
+const questionsToReadRecord = (tableName, column) => [{
+    type: "input",
+    message: `Please enter the ${column}_id`,
+    name: `${column}_id`,
+    validate(value) {
+        const valid =  !isNaN(parseInt(value));
+        return valid || 'Please enter a valid ID';
+    }
+}]
+
 const questionsToUpdateRecord = (tableName, column) => {
     return [
         {
@@ -109,6 +119,7 @@ const questionsToRemoveRecord = (tableName) => [{
 module.exports = {
     questionsMenu,
     questionsToAddRecord,
+    questionsToReadRecord,
     questionsToUpdateRecord,
     questionsToRemoveRecord
 };

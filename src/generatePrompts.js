@@ -2,7 +2,7 @@
 const inquirer = require('inquirer');
 const { displayTable } = require('./display');
 const { db } = require('./connectDB');
-const { questionsMenu, questionsToAddRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
+const { questionsMenu, questionsToAddRecord, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
@@ -16,43 +16,21 @@ const promptQuestions = () => {
                         .then(() => promptQuestions());
                     return;
                 case 'View All Employees By Department':
-                    inquirer.prompt([
-                        {
-                            type: "input",
-                            message: "Please enter the department ID",
-                            name: 'departmentID',
-                            validate(value) {
-                                const valid =  !isNaN(parseInt(value));
-                                return valid || 'Please enter a valid ID';
-                            },
-                        }
-                    ]).then(answer => {
-                        db.promise().query(`SELECT * FROM 
+                    inquirer.prompt(questionsToReadRecord('employee', 'department'))
+                        .then(answer => db.promise().query(`SELECT * FROM 
                                 employee a
                                 LEFT JOIN role b
                                 ON a.role_id = b.id
-                                WHERE b.department_id = ${answer.departmentID}`)
-                            .then((results) => displayTable('employee', results[0]))
-                            .then(() => promptQuestions());
-                    });
+                                WHERE b.department_id = ${answer.department_id}`))
+                        .then((results) => displayTable('employee', results[0]))
+                        .then(() => promptQuestions());
                     return;
                 case 'View All Employees By Manager':
-                    inquirer.prompt([
-                        {
-                            type: "input",
-                            message: "Please enter the manager ID",
-                            name: 'managerID',
-                            validate(value) {
-                                const valid =  !isNaN(parseInt(value));
-                                return valid || 'Please enter a valid ID';
-                            },
-                        }
-                    ]).then(answer => {
-                        db.promise().query(`SELECT * FROM employee 
-                                WHERE manager_id = ${answer.managerID}`)
-                            .then((results) => displayTable('employee', results[0]))
-                            .then(() => promptQuestions());
-                    });
+                    inquirer.prompt(questionsToReadRecord('employee', 'manager'))
+                        .then(answer => db.promise().query(`SELECT * FROM employee 
+                                    WHERE manager_id = ${answer.manager_id}`))
+                        .then((results) => displayTable('employee', results[0]))
+                        .then(() => promptQuestions());
                     return;
                 case 'Add An Employee': 
                     questionsToAddRecord('employee')
