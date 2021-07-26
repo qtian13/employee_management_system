@@ -2,12 +2,12 @@
 const inquirer = require('inquirer');
 const { displayTable } = require('./display');
 const { db } = require('./connectDB');
-const { questionsToAddRecord, questionsMenu } = require('../helpers/questions');
+const { questionsMenu, questionsToAddRecord, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
     inquirer
-        .prompt([questionsMenu])
+        .prompt(questionsMenu)
         .then((answer) => {
             switch (answer.todo) {
                 case 'View All Employees':
@@ -65,16 +65,20 @@ const promptQuestions = () => {
                         .then(() => promptQuestions())
                         .catch(err => console.error(err));
                     return;
-                // case 'Remove An Employee': 
-                //     inquirer.prompt(questionsToAddRecord('employee'))
-                //         .then(answer => {
-                //             const { id } = answer;
-                //             return db.promise().query(`DELETE FROM employee
-                //                                 WHERE id = ${id});`)
-                //         })
-                //         .then(() => promptQuestions())
-                //         .catch(err => console.error(err));
-                //     return;
+                case 'Remove An Employee': 
+                    inquirer.prompt(questionsToRemoveRecord('employee'))
+                        .then(answer => {
+                            const { id } = answer;
+                            return db.promise().query(`DELETE FROM employee
+                                                WHERE id = ${id};`)
+                        })
+                        .then(() => promptQuestions())
+                        .catch(err => console.error(err));
+                    return;
+                case 'Update An Employee Role':
+                    return;
+                case 'Update An Employee Manager':
+                    return;
                 case 'View All Roles':
                     db.promise().query(`SELECT * FROM role`)
                         .then((results) => displayTable('role', results[0]))
@@ -91,6 +95,16 @@ const promptQuestions = () => {
                         .then(() => promptQuestions())
                         .catch(err => console.error(err));
                     return;
+                case 'Remove A Role': 
+                    inquirer.prompt(questionsToRemoveRecord('role'))
+                        .then(answer => {
+                            const { id } = answer;
+                            return db.promise().query(`DELETE FROM role
+                                                WHERE id = ${id};`)
+                        })
+                        .then(() => promptQuestions())
+                        .catch(err => console.error(err));
+                    return;
                 case 'View All Departments':
                     db.promise().query(`SELECT * FROM department`)
                             .then((results) => displayTable('department', results[0]))
@@ -103,6 +117,16 @@ const promptQuestions = () => {
                             const { name } = answer;
                             return db.promise().query(`INSERT INTO department (name)
                                                 VALUES ("${name}");`)
+                        })
+                        .then(() => promptQuestions())
+                        .catch(err => console.error(err));
+                    return;
+                case 'Remove A Department': 
+                    inquirer.prompt(questionsToRemoveRecord('department'))
+                        .then(answer => {
+                            const { id } = answer;
+                            return db.promise().query(`DELETE FROM department
+                                                WHERE id = ${id};`)
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.error(err));

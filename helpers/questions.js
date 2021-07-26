@@ -1,6 +1,5 @@
 const { db } = require('../src/connectDB');
 
-
 const options = ['View All Employees', 
                 'View All Employees By Department', 
                 'View All Employees By Manager',
@@ -10,19 +9,19 @@ const options = ['View All Employees',
                 'Update An Employee Manager',
                 'View All Roles',
                 'Add A Role',
-                'Remove Role',
+                'Remove A Role',
                 'View All Departments',
                 'Add A Department',
                 'Remove A Department',
                 'View Total Utilized Budget By Department',
                 'Quit'];
 
-const questionsMenu = {
-                                type: 'list',
-                                message: 'What would you like to do?',
-                                choices: options,
-                                name: 'todo'
-                            };
+const questionsMenu = [{
+                        type: 'list',
+                        message: 'What would you like to do?',
+                        choices: options,
+                        name: 'todo'
+                    }];
 
 const questionsToAddRecord = (tableName) => {
     return db.promise().query('DESCRIBE ' + tableName)
@@ -74,8 +73,20 @@ const questionsToAddRecord = (tableName) => {
         });
 }
 
+const questionsToRemoveRecord = (tableName) => [{
+    type: 'input',
+    message: `Please enter ${tableName} id to delete`,
+    name: 'id',
+    validate(value) {
+        const valid = !isNaN(parseInt(value));
+        return valid || 'Please enter a number';
+    }
+}];
+
 module.exports = {
+    questionsMenu,
     questionsToAddRecord,
-    questionsMenu
+    questionsToUpdateRecord,
+    questionsToRemoveRecord
 };
 
