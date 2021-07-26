@@ -1,51 +1,20 @@
 
 const inquirer = require('inquirer');
-const {displayTable} = require('./display');
+const { displayTable } = require('./display');
 const { db } = require('./connectDB');
+const { questionsToAddRecord, questionsMenu } = require('../helpers/questions');
 const { throwError } = require('rxjs');
-
-const options = ['View All Employees', 
-                'View All Employees By Department', 
-                'View All Employees By Manager',
-                'Add An Employee',
-                'Remove An Employee',
-                'Update An Employee Role',
-                'Update An Employee Manager',
-                'View All Roles',
-                'Add A Role',
-                'Remove Role',
-                'View All Departments',
-                'Add A Department',
-                'Remove A Department',
-                'View Total Utilized Budget By Department',
-                'quit'];
-const createQuestionsAboutDepartMent = [{
-    
-}];
 
 const promptQuestions = () => {
     inquirer
-        .prompt([
-            {
-                type: 'list',
-                message: 'What would you like to do?',
-                choices: options,
-                name: 'todo'
-            }
-        ])
+        .prompt([questionsMenu])
         .then((answer) => {
             switch (answer.todo) {
                 case 'View All Employees':
                     db.promise().query(`SELECT * FROM employee`)
-                            .then((results) => displayTable('employee', results[0]))
-                            .then(() => promptQuestions());
+                        .then((results) => displayTable('employee', results[0]))
+                        .then(() => promptQuestions());
                     return;
-                case 'View All Roles':
-                    displayTable("role");
-                    return promptQuestions();
-                case 'View All Departments':
-                    displayTable("department");
-                    return promptQuestions();
                 case 'View All Employees By Department':
                     inquirer.prompt([
                         {
@@ -85,8 +54,64 @@ const promptQuestions = () => {
                             .then(() => promptQuestions());
                     });
                     return;
+                case 'Add An Employee': 
+                    questionsToAddRecord('employee')
+                        .then(questions => inquirer.prompt(questions))
+                        .then(answer => {
+                            const { first_name, last_name, role_id, manager_id } = answer;
+                            return db.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                                VALUES ("${first_name}", "${last_name}", ${role_id}, ${manager_id});`)
+                        })
+                        .then(() => promptQuestions())
+                        .catch(err => console.error(err));
+                    return;
+                // case 'Remove An Employee': 
+                //     inquirer.prompt(questionsToAddRecord('employee'))
+                //         .then(answer => {
+                //             const { id } = answer;
+                //             return db.promise().query(`DELETE FROM employee
+                //                                 WHERE id = ${id});`)
+                //         })
+                //         .then(() => promptQuestions())
+                //         .catch(err => console.error(err));
+                //     return;
+                case 'View All Roles':
+                    db.promise().query(`SELECT * FROM role`)
+                        .then((results) => displayTable('role', results[0]))
+                        .then(() => promptQuestions());
+                    return;
+                case 'Add A Role':
+                    questionsToAddRecord('role')
+                        .then(questions => inquirer.prompt(questions))
+                        .then(answer => {
+                            const { title, salary, department_id} = answer;
+                            return db.promise().query(`INSERT INTO role (title, salary, department_id)
+                                                VALUES ("${title}", ${salary}, ${department_id});`)
+                        })
+                        .then(() => promptQuestions())
+                        .catch(err => console.error(err));
+                    return;
+                case 'View All Departments':
+                    db.promise().query(`SELECT * FROM department`)
+                            .then((results) => displayTable('department', results[0]))
+                            .then(() => promptQuestions());
+                    return;
+                case 'Add A Department':
+                    questionsToAddRecord('department')
+                        .then(questions => inquirer.prompt(questions))
+                        .then(answer => {
+                            const { name } = answer;
+                            return db.promise().query(`INSERT INTO department (name)
+                                                VALUES ("${name}");`)
+                        })
+                        .then(() => promptQuestions())
+                        .catch(err => console.error(err));
+                    return;
+                case 'Quit':
+                    console.log("Thanks for using! Bye!")
+                    return;
                 default:
-                    console.log('No idea how to do it');
+                    console.log('Sorry, no idea how to do it');
                     return;
             }
         })

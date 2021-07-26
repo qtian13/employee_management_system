@@ -1,54 +1,50 @@
 const { db } = require('./connectDB');
-const inquirer = require('inquirer');
 
-const displaySymbol = (length, symbol) => {
-    let symbols = "";
-    for (let i = 0; i < length; i++) {
-        symbols += symbol;
-    }
-    return symbols;
-};
 
 const displayTable = (tableName, records) => {
     return db.promise().query('DESCRIBE ' + tableName)
-        .then((results) => {
-            let columnsLength = {};
-            results[0].forEach(object => {
-                const column = object.Field;
-                columnsLength[column] = column.length;
-            });
-            if (('first_name' in columnsLength) && ('last_name' in columnsLength)) {
-                delete columnsLength.first_name;
-                delete columnsLength.last_name;
-                columnsLength.name = "name".length;
-            }
-            return columnsLength;
-        })
+        .then((results) => getColumnsName(results[0]))
         .catch(console.error())
-        .then((columnsLength) => {
-            return formatTable(updateColumnsWidth(columnsLength, records), records);
+        .then((columnsFormat) => {
+            updatedColumnsFormat = updateColumnsFormat(columnsFormat, records);
+            formatTable(updatedColumnsFormat, records);
+            return;
         })
 };
 
-const formatTable = (columnsLength, records) => {
+const getColumnsName = (columns) => {
+    let columnsFormat = {};
+    columns.forEach(object => {
+        const column = object.Field;
+        columnsFormat[column] = column.length;
+    });
+    if (('first_name' in columnsFormat) && ('last_name' in columnsFormat)) {
+        delete columnsFormat.first_name;
+        delete columnsFormat.last_name;
+        columnsFormat.name = "name".length;
+    }
+    return columnsFormat;
+}
+
+const formatTable = (columnsFormat, records) => {
     let tableHeader = "";
     let seperator = "";
-    Object.keys(columnsLength).forEach((key) => {
-        tableHeader += key + displaySymbol(columnsLength[key] - key.length, " ") + "  ";
-        seperator += displaySymbol(columnsLength[key], "-") + "  ";
+    Object.keys(columnsFormat).forEach((key) => {
+        tableHeader += key + displaySymbol(columnsFormat[key] - key.length, " ") + "  ";
+        seperator += displaySymbol(columnsFormat[key], "-") + "  ";
     })
     console.log(tableHeader);
     console.log(seperator);
     records.forEach(record => {
         let recordRow = "";
-        Object.keys(columnsLength).forEach(key => {
-            recordRow += record[key] + displaySymbol(columnsLength[key] - (record[key] + "").length, " ") + "  ";
+        Object.keys(columnsFormat).forEach(key => {
+            recordRow += record[key] + displaySymbol(columnsFormat[key] - (record[key] + "").length, " ") + "  ";
         })
         console.log(recordRow);
     })
 }
 
-const updateColumnsWidth = (columnsLength, records) => {
+const updateColumnsFormat = (columnsFormat, records) => {
     records.forEach(record => {
         let name = "";
         let hasFirstName = false;
@@ -65,18 +61,28 @@ const updateColumnsWidth = (columnsLength, records) => {
             if (hasFirstName && hasLastName) {
                 delete record.first_name;
                 delete record.last_name;
-                delete columnsLength.first_name;
-                delete columnsLength.last_name;
+                delete columnsFormat.first_name;
+                delete columnsFormat.last_name;
                 record.name = name;
-                columnsLength.name = Math.max(columnsLength.name, name.length);
+                columnsFormat.name = Math.max(columnsFormat.name, name.length);
             } else {
-                columnsLength[key] = Math.max(columnsLength[key], (record[key] + "").length);
+                columnsFormat[key] = Math.max(columnsFormat[key], (record[key] + "").length);
             }
         });
     });
-    return columnsLength;
+    return columnsFormat;
 }
 
+
+const displaySymbol = (length, symbol) => {
+    let symbols = "";
+    for (let i = 0; i < length; i++) {
+        symbols += symbol;
+    }
+    return symbols;
+};
+
 module.exports = {
-    displayTable
+    displayTable,
+    getColumnsName
 };
