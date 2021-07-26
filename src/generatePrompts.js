@@ -2,7 +2,7 @@
 const inquirer = require('inquirer');
 const { displayTable } = require('./display');
 const { db } = require('./connectDB');
-const { questionsMenu, questionsToAddRecord, questionsToRemoveRecord} = require('../helpers/questions');
+const { questionsMenu, questionsToAddRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
@@ -76,8 +76,26 @@ const promptQuestions = () => {
                         .catch(err => console.error(err));
                     return;
                 case 'Update An Employee Role':
+                    inquirer.prompt(questionsToUpdateRecord('employee', 'role'))
+                        .then(answer => {
+                            const { id, role_id } = answer;
+                            return db.promise().query(`UPDATE employee
+                                                        SET role_id = ${role_id}
+                                                        WHERE id = ${id};`)
+                        })
+                        .then(() => promptQuestions())
+                        .catch(err => console.error(err));
                     return;
                 case 'Update An Employee Manager':
+                    inquirer.prompt(questionsToUpdateRecord('employee', 'manager'))
+                        .then(answer => {
+                            const { id, manager_id } = answer;
+                            return db.promise().query(`UPDATE employee
+                                                        SET manager_id = ${manager_id}
+                                                        WHERE id = ${id};`)
+                        })
+                        .then(() => promptQuestions())
+                        .catch(err => console.error(err));
                     return;
                 case 'View All Roles':
                     db.promise().query(`SELECT * FROM role`)

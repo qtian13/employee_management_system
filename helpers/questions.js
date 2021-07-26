@@ -73,6 +73,29 @@ const questionsToAddRecord = (tableName) => {
         });
 }
 
+const questionsToUpdateRecord = (tableName, column) => {
+    return [
+        {
+            type: 'input',
+            message: `Please enter ${tableName} id to update`,
+            name: 'id',
+            validate(value) {
+                const valid = !isNaN(parseInt(value));
+                return valid || 'Please enter a number';
+            }
+        },
+        {
+            type: 'input',
+            message: `Please enter ${column}_id to update`,
+            name: `${column}_id`,
+            validate(value) {
+                const valid = !isNaN(parseInt(value));
+                return valid || 'Please enter a number';
+            }
+        }
+    ];
+};
+
 const questionsToRemoveRecord = (tableName) => [{
     type: 'input',
     message: `Please enter ${tableName} id to delete`,
