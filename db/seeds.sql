@@ -12,4 +12,5 @@ VALUES ("manager", 150000, 1),
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Er", "Gou", 1, NULL),
        ("ha", "la", 4, 1),
-       ("Ha", "Ma", 4, 1);
+       ("Ha", "Ma", 4, 1),
+       ("siri", "Ma", 2, 1);

@@ -10,4 +10,13 @@ const db = mysql.createConnection(
     console.log(`Connected to the employee_management_system database.`)
 );
 
-module.exports = db;
+const dbQuery = (tableName, column, value) => {
+    db.promise().query(`SELECT * FROM ${tableName} WHERE ${column} = ${value}`)
+        .then((results) => console.log(results[0]))
+        .catch(console.log());
+};
+
+module.exports = {
+    db,
+    dbQuery
+};
