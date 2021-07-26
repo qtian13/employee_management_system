@@ -3,9 +3,7 @@ const mysql = require('mysql2');
 const db = mysql.createConnection(
     {
       host: 'localhost',
-      // MySQL username,
       user: 'root',
-      // MySQL password
       password: 'mysqlpassword',
       database: 'employee_management_system'
     },
@@ -13,5 +11,3 @@ const db = mysql.createConnection(
 );
 
 module.exports = db;
-
-  

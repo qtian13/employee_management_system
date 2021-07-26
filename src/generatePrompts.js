@@ -1,6 +1,6 @@
 
 const inquirer = require('inquirer');
-const {displayEmployee} = require('./display');
+const {displayTable} = require('./display');
 const db = require('./connectDB');
 const { throwError } = require('rxjs');
 
@@ -36,10 +36,16 @@ const promptQuestions = () => {
         .then(answer => {
             switch (answer.todo) {
                 case 'View All Employees':
-                    db.query('SELECT * FROM employee', function (err, results) {
-                        if (err) throw err;
-                        displayEmployee(results);
-                    });
+                    displayTable("employee");
+                    promptQuestions();
+                    break;
+                case 'View All Roles':
+                    displayTable("role");
+                    promptQuestions();
+                    break;
+                case 'View All Departments':
+                    displayTable("department");
+                    promptQuestions()
                     break;
                 default:
                     console.log('No idea how to do it');
