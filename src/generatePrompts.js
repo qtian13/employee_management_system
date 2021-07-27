@@ -10,17 +10,17 @@ const promptQuestions = () => {
     inquirer
         .prompt(questionsMenu)
         .then((answer) => {
+            const sqlDisplayEmployee = `SELECT a.id, a.first_name, a.last_name, role.title, CONCAT_WS(' ', b.first_name, b.last_name) AS 'manager', role.salary, department.name AS department
+                                        FROM employee a
+                                        LEFT JOIN role
+                                        ON a.role_id = role.id
+                                        LEFT JOIN employee b
+                                        ON a.manager_id = b.id
+                                        LEFT JOIN department
+                                        ON role.department_id = department.id`;
             switch (answer.todo) {
                 case 'View All Employees': {
-                    const sql = `SELECT a.id, a.first_name, a.last_name, role.title, CONCAT_WS(' ', b.first_name, b.last_name) AS 'manager', role.salary, department.name AS department
-                                 FROM employee a
-                                 LEFT JOIN role
-                                 ON a.role_id = role.id
-                                 LEFT JOIN employee b
-                                 ON a.manager_id = b.id
-                                 LEFT JOIN department
-                                 ON role.department_id = department.id`;
-                    db.promise().query(sql)
+                    db.promise().query(sqlDisplayEmployee)
                         .then(results => {
                             console.table(results[0]);
                             promptQuestions();
@@ -31,16 +31,8 @@ const promptQuestions = () => {
                 case 'View All Employees By Department': {
                     inquirer.prompt(questionsToReadRecord('employee', 'department'))
                         .then(answer => {
-                            const sql = `SELECT a.id, a.first_name, a.last_name, role.title, CONCAT_WS(' ', b.first_name, b.last_name) AS 'manager', role.salary, department.name AS department
-                                         FROM employee a
-                                         LEFT JOIN role
-                                         ON a.role_id = role.id
-                                         LEFT JOIN employee b
-                                         ON a.manager_id = b.id
-                                         LEFT JOIN department
-                                         ON role.department_id = department.id
-                                         WHERE role.department_id = ${answer.department_id}`;
-                            return db.promise().query(sql);
+                            const sql = sqlDisplayEmployee + ` WHERE role.department_id = ?`;
+                            return db.promise().query(sql, [answer.department_id]);
                         })
                         .then(results => {
                             console.table(results[0]);
@@ -52,16 +44,8 @@ const promptQuestions = () => {
                 case 'View All Employees By Manager': {
                     inquirer.prompt(questionsToReadRecord('employee', 'manager'))
                         .then(answer => {
-                            const sql = `SELECT a.id, a.first_name, a.last_name, role.title, CONCAT_WS(' ', b.first_name, b.last_name) AS 'manager', role.salary, department.name AS department
-                                         FROM employee a
-                                         LEFT JOIN role
-                                         ON a.role_id = role.id
-                                         LEFT JOIN employee b
-                                         ON a.manager_id = b.id
-                                         LEFT JOIN department
-                                         ON role.department_id = department.id
-                                         WHERE a.manager_id = ${answer.manager_id}`
-                            return db.promise().query(sql);
+                            const sql = sqlDisplayEmployee + ` WHERE a.manager_id = ?`;
+                            return db.promise().query(sql, [answer.manager_id]);
                         })
                         .then(results => {
                             console.table(results[0]);
@@ -75,9 +59,10 @@ const promptQuestions = () => {
                         .then(questions => inquirer.prompt(questions))
                         .then(answer => {
                             const { first_name, last_name, role_id, manager_id } = answer;
+                            const params = [first_name, last_name, role_id, manager_id];
                             const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-                                         VALUES ("${first_name}", "${last_name}", ${role_id}, ${manager_id});`;
-                            return db.promise().query(sql);
+                                         VALUES (?, ?, ?, ?);`;
+                            return db.promise().query(sql, params);
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
@@ -87,9 +72,10 @@ const promptQuestions = () => {
                     inquirer.prompt(questionsToRemoveRecord('employee'))
                         .then(answer => {
                             const { id } = answer;
+                            const params = [id];
                             const sql = `DELETE FROM employee
-                                         WHERE id = ${id};`;
-                            return db.promise().query(sql);
+                                         WHERE id = ?;`;
+                            return db.promise().query(sql, params);
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
@@ -99,10 +85,11 @@ const promptQuestions = () => {
                     inquirer.prompt(questionsToUpdateRecord('employee', 'role'))
                         .then(answer => {
                             const { id, role_id } = answer;
+                            const params = [role_id, id];
                             const sql = `UPDATE employee
-                                         SET role_id = ${role_id}
-                                         WHERE id = ${id};`
-                            return db.promise().query(sql);
+                                         SET role_id = ?
+                                         WHERE id = ?;`
+                            return db.promise().query(sql, params);
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
@@ -112,10 +99,11 @@ const promptQuestions = () => {
                     inquirer.prompt(questionsToUpdateRecord('employee', 'manager'))
                         .then(answer => {
                             const { id, manager_id } = answer;
+                            const params = [manager_id, id];
                             const sql = `UPDATE employee
-                                         SET manager_id = ${manager_id}
-                                         WHERE id = ${id};`;
-                            return db.promise().query(sql);
+                                         SET manager_id = ?
+                                         WHERE id = ?;`;
+                            return db.promise().query(sql, params);
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
@@ -138,10 +126,11 @@ const promptQuestions = () => {
                     questionsToAddRecord('role')
                         .then(questions => inquirer.prompt(questions))
                         .then(answer => {
-                            const { title, salary, department_id} = answer;
+                            const { title, salary, department_id } = answer;
+                            const params = [title, salary, department_id];
                             const sql = `INSERT INTO role (title, salary, department_id)
-                            VALUES ("${title}", ${salary}, ${department_id});`;
-                            return db.promise().query(sql);
+                            VALUES (?, ?, ?);`;
+                            return db.promise().query(sql, params);
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.error(err));
@@ -151,9 +140,10 @@ const promptQuestions = () => {
                     inquirer.prompt(questionsToRemoveRecord('role'))
                         .then(answer => {
                             const { id } = answer;
+                            const params = [id];
                             const sql = `DELETE FROM role
-                                         WHERE id = ${id};`;
-                            return db.promise().query(sql);
+                                         WHERE id = ?;`;
+                            return db.promise().query(sql, params);
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
@@ -174,9 +164,10 @@ const promptQuestions = () => {
                         .then(questions => inquirer.prompt(questions))
                         .then(answer => {
                             const { name } = answer;
+                            const params = [name];
                             const sql = `INSERT INTO department (name)
-                                         VALUES ("${name}");`;
-                            return db.promise().query(sql);
+                                         VALUES (?);`;
+                            return db.promise().query(sql, params);
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
@@ -186,9 +177,10 @@ const promptQuestions = () => {
                     inquirer.prompt(questionsToRemoveRecord('department'))
                         .then(answer => {
                             const { id } = answer;
+                            const params = [id];
                             const sql = `DELETE FROM department
-                                         WHERE id = ${id};`;
-                            return db.promise().query(sql);
+                                         WHERE id = ?;`;
+                            return db.promise().query(sql, params);
                         })
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
