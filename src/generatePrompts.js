@@ -2,7 +2,8 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 
-const { db } = require('./connectDB');
+const db = require('./connectDB');
+const { getEmployee, getRole, getDepartments } = require('./dbOp');
 const { questionsMenu, questionsToAddRecord, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
@@ -20,9 +21,9 @@ const promptQuestions = () => {
                                         ON role.department_id = department.id`;
             switch (answer.todo) {
                 case 'View All Employees': {
-                    db.promise().query(sqlDisplayEmployee)
+                    getEmployee()
                         .then(results => {
-                            console.table(results[0]);
+                            console.table(results);
                             promptQuestions();
                         })
                         .catch(err => console.log(err));
@@ -110,13 +111,9 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'View All Roles': {
-                    const sql = `SELECT role.id, title, salary, department.name AS department 
-                                 FROM role
-                                 LEFT JOIN department
-                                 ON role.department_id = department.id`;
-                    db.promise().query(sql)
+                    getRole()
                         .then(results => {
-                            console.table(results[0]);
+                            console.table(results);
                             promptQuestions();
                         })
                         .catch(err => console.log(err));
@@ -150,10 +147,9 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'View All Departments': {
-                    const sql = `SELECT * FROM department`;
-                    db.promise().query(sql)
+                    getDepartments()
                         .then(results => {
-                            console.table(results[0]);
+                            console.table(results);
                             promptQuestions();
                         })
                         .catch(err => console.log(err));
