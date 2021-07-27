@@ -12,7 +12,12 @@ const db = mysql.createConnection(
 
 const dbQuery = (tableName, column, value) => {
     db.promise().query(`SELECT * FROM ${tableName} WHERE ${column} = ${value}`)
-        .then((results) => console.log(results[0]))
+        .then((results) => {
+            
+            results[0].forEach(record => {
+
+            })
+        })
         .catch(console.log());
 };
 

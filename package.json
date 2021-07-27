@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/qtian13/employee_management_system#readme",
   "dependencies": {
+    "console.table": "^0.10.0",
     "inquirer": "^8.1.2",
     "mysql2": "^2.2.5"
   }
