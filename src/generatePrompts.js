@@ -3,8 +3,8 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 
 const db = require('./connectDB');
-const { getEmployee, getRole, getDepartments } = require('./dbOp');
-const { questionsMenu, questionsToAddRecord, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
+const { getEmployee, getRole, getDepartments, addDepartment } = require('./dbOp');
+const { questionsMenu, questionsToAddRecord, questionsToAddDepartment, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
@@ -156,15 +156,9 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'Add A Department': {
-                    questionsToAddRecord('department')
-                        .then(questions => inquirer.prompt(questions))
-                        .then(answer => {
-                            const { name } = answer;
-                            const params = [name];
-                            const sql = `INSERT INTO department (name)
-                                         VALUES (?);`;
-                            return db.promise().query(sql, params);
-                        })
+                    inquirer.prompt(questionsToAddDepartment)
+                        .then(answer => addDepartment(answer.name))
+                        .catch(err => console.log(err))
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
                     return;

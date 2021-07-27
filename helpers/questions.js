@@ -73,6 +73,17 @@ const questionsToAddRecord = (tableName) => {
         });
 }
 
+
+questionsToAddDepartment = [{
+    type: 'input',
+    name: 'name',
+    message: 'Please enter the name of department you want to add',
+    validate(value) {
+        const valid = (value.trim().length <= 30);
+        return valid || `Please enter no more than 30 characters`;
+    }
+}];
+
 const questionsToReadRecord = (tableName, column) => [{
     type: "input",
     message: `Please enter the ${column}_id`,
@@ -119,6 +130,7 @@ const questionsToRemoveRecord = (tableName) => [{
 module.exports = {
     questionsMenu,
     questionsToAddRecord,
+    questionsToAddDepartment,
     questionsToReadRecord,
     questionsToUpdateRecord,
     questionsToRemoveRecord

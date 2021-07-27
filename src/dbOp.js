@@ -9,12 +9,15 @@ const sqlDisplayEmployee = `SELECT a.id, a.first_name, a.last_name, role.title, 
                             LEFT JOIN department
                             ON role.department_id = department.id`;
 
-const sqlDisplayDepartment = `SELECT * FROM department`;
-
 const sqlDisplayRole = `SELECT role.id, title, salary, department.name AS department 
                         FROM role
                         LEFT JOIN department
                         ON role.department_id = department.id`;
+
+const sqlDisplayDepartment = `SELECT * FROM department`;
+
+const sqlAddDepartment = `INSERT INTO department (name) VALUES (?)`;
+
                     
 const getEmployee = () => db.promise().query(sqlDisplayEmployee)
                             .then(results => results[0])
@@ -28,8 +31,12 @@ const getDepartments = () => db.promise().query(sqlDisplayDepartment)
                                 .then(results => results[0])
                                 .catch(err => console.log(err));
 
+const addDepartment = (name) => db.promise().query(sqlAddDepartment, [name])
+                                    .catch(err => console.log(err));
+
 module.exports = {
     getEmployee,
     getRole,
     getDepartments,
+    addDepartment,
 };
