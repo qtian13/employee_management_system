@@ -173,6 +173,22 @@ const promptQuestions = () => {
                         .catch(err => console.log(err));
                     return;
                 }
+                case 'View Total Utilized Budget By Department' : {
+                    const sql = `SELECT department.name AS department, SUM(salary) AS total_budget 
+                                 FROM employee 
+                                 LEFT JOIN role 
+                                 ON employee.role_id = role.id
+                                 LEFT JOIN department 
+                                 ON role.department_id = department.id
+                                 GROUP BY department_id`;
+                    db.promise().query(sql)
+                        .then(results => {
+                            console.table(results[0]);
+                            promptQuestions();
+                        })
+                        .catch(err => console.log(err));
+                    return;
+                }
                 case 'Quit': {
                     return console.log("Thanks for using! Bye!");
                 }
