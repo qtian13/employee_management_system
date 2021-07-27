@@ -12,7 +12,14 @@ const promptQuestions = () => {
         .then((answer) => {
             switch (answer.todo) {
                 case 'View All Employees': {
-                    const sql = `SELECT id, CONCAT_WS(' ', employee.first_name, employee.last_name) AS name, role_id, manager_id FROM employee`;
+                    const sql = `SELECT a.id, a.first_name, a.last_name, role.title, CONCAT_WS(' ', b.first_name, b.last_name) AS 'manager', role.salary, department.name AS department
+                                 FROM employee a
+                                 LEFT JOIN role
+                                 ON a.role_id = role.id
+                                 LEFT JOIN employee b
+                                 ON a.manager_id = b.id
+                                 LEFT JOIN department
+                                 ON role.department_id = department.id`;
                     db.promise().query(sql)
                         .then(results => {
                             console.table(results[0]);
@@ -24,10 +31,14 @@ const promptQuestions = () => {
                 case 'View All Employees By Department': {
                     inquirer.prompt(questionsToReadRecord('employee', 'department'))
                         .then(answer => {
-                            const sql = `SELECT employee.id, CONCAT_WS(' ', employee.first_name, employee.last_name) AS name, employee.role_id, employee.manager_id  
-                                         FROM employee
+                            const sql = `SELECT a.id, a.first_name, a.last_name, role.title, CONCAT_WS(' ', b.first_name, b.last_name) AS 'manager', role.salary, department.name AS department
+                                         FROM employee a
                                          LEFT JOIN role
-                                         ON employee.role_id = role.id
+                                         ON a.role_id = role.id
+                                         LEFT JOIN employee b
+                                         ON a.manager_id = b.id
+                                         LEFT JOIN department
+                                         ON role.department_id = department.id
                                          WHERE role.department_id = ${answer.department_id}`;
                             return db.promise().query(sql);
                         })
@@ -41,8 +52,15 @@ const promptQuestions = () => {
                 case 'View All Employees By Manager': {
                     inquirer.prompt(questionsToReadRecord('employee', 'manager'))
                         .then(answer => {
-                            const sql = `SELECT id, CONCAT_WS(' ', employee.first_name, employee.last_name) AS name, role_id, manager_id FROM employee 
-                                         WHERE manager_id = ${answer.manager_id}`
+                            const sql = `SELECT a.id, a.first_name, a.last_name, role.title, CONCAT_WS(' ', b.first_name, b.last_name) AS 'manager', role.salary, department.name AS department
+                                         FROM employee a
+                                         LEFT JOIN role
+                                         ON a.role_id = role.id
+                                         LEFT JOIN employee b
+                                         ON a.manager_id = b.id
+                                         LEFT JOIN department
+                                         ON role.department_id = department.id
+                                         WHERE a.manager_id = ${answer.manager_id}`
                             return db.promise().query(sql);
                         })
                         .then(results => {
@@ -104,7 +122,10 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'View All Roles': {
-                    const sql = `SELECT * FROM role`;
+                    const sql = `SELECT role.id, title, salary, department.name AS department 
+                                 FROM role
+                                 LEFT JOIN department
+                                 ON role.department_id = department.id`;
                     db.promise().query(sql)
                         .then(results => {
                             console.table(results[0]);
