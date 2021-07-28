@@ -59,23 +59,18 @@ const getDepartments = () => db.promise().query(sqlDisplayDepartment)
 
 const addEmployee = (firstName, lastName, roleId, managerId) => {
     const params = [firstName, lastName, roleId, managerId];
-    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-                 VALUES (?, ?, ?, ?);`
+    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);`
     return db.promise().query(sql, params);
 }
 
 const updateEmployeeRole = (roleId, employeeId) => {
-    const sql = `UPDATE employee
-                 SET role_id = ?
-                 WHERE id = ?`;
+    const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
     const params = [roleId, employeeId];
     return db.promise().query(sql, params);
 }
 
 const updateEmployeeManager = (managerId, employeeId) => {
-    const sql = `UPDATE employee
-                 SET manager_id = ?
-                 WHERE id = ?`;
+    const sql = `UPDATE employee SET manager_id = ? WHERE id = ?`;
     const params = [managerId, employeeId];
     return db.promise().query(sql, params);
 }
@@ -100,13 +95,25 @@ const removeDepartment = (departmentId) => {
 
 const addRole = (title, salary, department_id) => {
     const params = [title, salary, department_id];
-    const sql = `INSERT INTO role (title, salary, department_id)
-                 VALUES (?, ?, ?);`;
+    const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);`;
     return db.promise().query(sql, params);
 }
 
-const addDepartment = (name) => db.promise().query(sqlAddDepartment, [name])
-                                    .catch(err => console.log(err));
+const addDepartment = (name) => db.promise().query(sqlAddDepartment, [name]);
+
+const getTotalUtilizedBudgetByDepartment = () => {
+    const sql = `SELECT department.name AS department, SUM(salary) AS total_budget 
+                 FROM employee 
+                 LEFT JOIN role 
+                 ON employee.role_id = role.id
+                 LEFT JOIN department 
+                 ON role.department_id = department.id
+                 GROUP BY department_id`;
+    return db.promise().query(sql)
+            .then(results => results[0])
+            .catch(err => console.log(err));
+
+}
 
 module.exports = {
     getEmployees,
@@ -122,5 +129,6 @@ module.exports = {
     updateEmployeeManager,
     removeEmployee,
     removeRole,
-    removeDepartment
+    removeDepartment,
+    getTotalUtilizedBudgetByDepartment
 };

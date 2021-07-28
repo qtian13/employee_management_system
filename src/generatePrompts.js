@@ -2,8 +2,7 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 
-const db = require('./connectDB');
-const { getEmployees, getEmployeesByDepartment, getEmployeesByManager, getRoles, getDepartments, addEmployee, addRole, addDepartment, updateEmployeeRole, updateEmployeeManager, removeEmployee, removeRole, removeDepartment } = require('./dbOp');
+const { getEmployees, getEmployeesByDepartment, getEmployeesByManager, getRoles, getDepartments, addEmployee, addRole, addDepartment, updateEmployeeRole, updateEmployeeManager, removeEmployee, removeRole, removeDepartment, getTotalUtilizedBudgetByDepartment } = require('./dbOp');
 const { questionsMenu, generateQuestionToSelectDepartment, generateQuestionToSelectManager, generateQuestionToSelectEmployee, generateQuestionToSelectRole, generateQuestionsToAddEmloyee, generateQuestionsToAddRole, generateQuestionToAddDepartment, generateQuestionsToUpdateRole, generateQuestionsToUpdateManager } = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
@@ -144,16 +143,9 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'View Total Utilized Budget By Department' : {
-                    const sql = `SELECT department.name AS department, SUM(salary) AS total_budget 
-                                 FROM employee 
-                                 LEFT JOIN role 
-                                 ON employee.role_id = role.id
-                                 LEFT JOIN department 
-                                 ON role.department_id = department.id
-                                 GROUP BY department_id`;
-                    db.promise().query(sql)
+                    getTotalUtilizedBudgetByDepartment()
                         .then(results => {
-                            console.table(results[0]);
+                            console.table(results);
                             promptQuestions();
                         })
                         .catch(err => console.log(err));
