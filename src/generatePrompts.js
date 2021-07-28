@@ -3,8 +3,8 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 
 const db = require('./connectDB');
-const { getEmployee, getRole, getDepartments, addDepartment } = require('./dbOp');
-const { questionsMenu, questionsToAddRecord, generateQuestionsToAddRole, generateQuestionToAddDepartment, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
+const { getEmployees, getRoles, getDepartments, addEmployee, addRole, addDepartment } = require('./dbOp');
+const { questionsMenu, questionsToAddRecord, generateQuestionsToAddEmloyee, generateQuestionsToAddRole, generateQuestionToAddDepartment, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
@@ -21,7 +21,7 @@ const promptQuestions = () => {
                                         ON role.department_id = department.id`;
             switch (answer.todo) {
                 case 'View All Employees': {
-                    getEmployee()
+                    getEmployees()
                         .then(results => {
                             console.table(results);
                             promptQuestions();
@@ -56,15 +56,11 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'Add An Employee': {
-                    questionsToAddRecord('employee')
+                    generateQuestionsToAddEmloyee()
                         .then(questions => inquirer.prompt(questions))
-                        .then(answer => {
-                            const { first_name, last_name, role_id, manager_id } = answer;
-                            const params = [first_name, last_name, role_id, manager_id];
-                            const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-                                         VALUES (?, ?, ?, ?);`;
-                            return db.promise().query(sql, params);
-                        })
+                        .catch(err => console.log(err))
+                        .then(answer => addEmployee(answer.first_name, answer.last_name, answer.role_id, answer.manager_id))
+                        .catch(err => console.log(err))
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
                     return;
@@ -111,7 +107,7 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'View All Roles': {
-                    getRole()
+                    getRoles()
                         .then(results => {
                             console.table(results);
                             promptQuestions();
@@ -122,28 +118,11 @@ const promptQuestions = () => {
                 case 'Add A Role': {
                     generateQuestionsToAddRole()
                         .then(questions => inquirer.prompt(questions))
-                        .then(answer => {
-                            const { title, salary, department_id } = answer;
-                            const params = [title, salary, department_id];
-                            const sql = `INSERT INTO role (title, salary, department_id)
-                            VALUES (?, ?, ?);`;
-                            return db.promise().query(sql, params);
-                        })
+                        .then(answer => addRole(answer.title, answer.salary, answer.department_id))
+                        .catch(err => console.error(err))
                         .then(() => promptQuestions())
                         .catch(err => console.error(err));
                     return;
-                    // questionsToAddRecord('role')
-                    //     .then(questions => inquirer.prompt(questions))
-                    //     .then(answer => {
-                    //         const { title, salary, department_id } = answer;
-                    //         const params = [title, salary, department_id];
-                    //         const sql = `INSERT INTO role (title, salary, department_id)
-                    //         VALUES (?, ?, ?);`;
-                    //         return db.promise().query(sql, params);
-                    //     })
-                    //     .then(() => promptQuestions())
-                    //     .catch(err => console.error(err));
-                    // return;
                 }
                 case 'Remove A Role': {
                     inquirer.prompt(questionsToRemoveRecord('role'))

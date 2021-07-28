@@ -16,14 +16,26 @@ const sqlDisplayRole = `SELECT role.id, title, salary, department.name AS depart
 
 const sqlDisplayDepartment = `SELECT * FROM department`;
 
+const sqlGetManagers = `SELECT employee.id, CONCAT_WS(' ', first_name, last_name) AS 'manager_name', role.title, department.name AS department 
+                        FROM employee
+                        LEFT JOIN role
+                        ON employee.role_id = role.id
+                        LEFT JOIN department
+                        ON role.department_id = department.id
+                        WHERE role.title = 'manager'`;
+
 const sqlAddDepartment = `INSERT INTO department (name) VALUES (?)`;
 
                     
-const getEmployee = () => db.promise().query(sqlDisplayEmployee)
+const getEmployees = () => db.promise().query(sqlDisplayEmployee)
+                            .then(results => results[0])
+                            .catch(err => console.log(err));
+                        
+const getManagers = () => db.promise().query(sqlGetManagers)
                             .then(results => results[0])
                             .catch(err => console.log(err));
 
-const getRole = () => db.promise().query(sqlDisplayRole)
+const getRoles = () => db.promise().query(sqlDisplayRole)
                             .then(results => results[0])
                             .catch(err => console.log(err));                                
                             
@@ -31,12 +43,29 @@ const getDepartments = () => db.promise().query(sqlDisplayDepartment)
                                 .then(results => results[0])
                                 .catch(err => console.log(err));
 
+const addEmployee = (firstName, lastName, roleId, managerId) => {
+    const params = [firstName, lastName, roleId, managerId];
+    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                 VALUES (?, ?, ?, ?);`
+    return db.promise().query(sql, params);
+}
+
+const addRole = (title, salary, department_id) => {
+    const params = [title, salary, department_id];
+    const sql = `INSERT INTO role (title, salary, department_id)
+                 VALUES (?, ?, ?);`;
+    return db.promise().query(sql, params);
+}
+
 const addDepartment = (name) => db.promise().query(sqlAddDepartment, [name])
                                     .catch(err => console.log(err));
 
 module.exports = {
-    getEmployee,
-    getRole,
+    getEmployees,
+    getManagers,
+    getRoles,
     getDepartments,
+    addEmployee,
+    addRole,
     addDepartment,
 };

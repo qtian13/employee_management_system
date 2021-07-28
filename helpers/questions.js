@@ -1,5 +1,5 @@
 const { db } = require('../src/connectDB');
-const { getEmployee, getRole, getDepartments, addDepartment } = require('../src/dbOp');
+const { getEmployees, getManagers, getRoles, getDepartments, addDepartment } = require('../src/dbOp');
 
 const options = ['View All Employees', 
                 'View All Employees By Department', 
@@ -85,6 +85,28 @@ const generateChoicesOfDepartment = () => {
         .catch(err => console.log(err))
 }
 
+const generateChoicesOfRole = () => {
+    return getRoles()
+        .then(result => result.map(role => {
+            let choice = {};
+            choice.name = role.title + " in " + role.department;
+            choice.value = role.id;
+            return choice
+        }))
+        .catch(err => console.log(err))
+}
+
+const generateChoicesOfManager = () => {
+    return getManagers()
+                .then(result => result.map(manager => {
+                    let choice = {};
+                    choice.name = manager.title + " " + manager.manager_name + " in " + manager.department;
+                    choice.value = manager.id;
+                    return choice
+                }))
+                .catch(err => console.log(err))
+}
+
 const generateCharInputQuestions = (tableName, columnName, maxLength) => {
     const type = 'input';
     const name = columnName;
@@ -117,7 +139,6 @@ const generateIntInputQuestions = (tableName, columnName) => {
     return question;
 }
 
-
 const generateFloatInputQuestions = (tableName, columnName) => {
     const type = 'input';
     const name = columnName;
@@ -147,7 +168,23 @@ const generateListQuestions = (answerName, choices) => {
     return question;
 }
 
-// generateChoicesOfDepartment().then(result => console.log(result));
+const generateQuestionsToAddEmloyee = () => {
+    let questions = [
+        generateCharInputQuestions('employee', 'first_name', 30),
+        generateCharInputQuestions('employee', 'last_name', 30)
+    ]
+    return generateChoicesOfRole()
+                .then(choices => {
+                    questions.push(generateListQuestions('role_id', choices));
+                    return generateChoicesOfManager();
+                })
+                .catch(err => console.log(err))
+                .then(choices => {
+                    questions.push(generateListQuestions('manager_id', choices));
+                    return questions;
+                })
+                .catch(err => console.log(err));
+};
 
 const generateQuestionsToAddRole = () => {
     return generateChoicesOfDepartment()
@@ -207,6 +244,7 @@ const questionsToRemoveRecord = (tableName) => [{
 module.exports = {
     questionsMenu,
     questionsToAddRecord,
+    generateQuestionsToAddEmloyee,
     generateQuestionsToAddRole,
     generateQuestionToAddDepartment,
     questionsToReadRecord,
