@@ -1,5 +1,4 @@
-const { db } = require('../src/connectDB');
-const { getEmployees, getManagers, getRoles, getDepartments, addDepartment } = require('../src/dbOp');
+const { getEmployees, getManagers, getRoles, getDepartments } = require('../src/dbOp');
 
 const options = ['View All Employees', 
                 'View All Employees By Department', 
@@ -24,56 +23,6 @@ const questionsMenu = [{
                         name: 'todo'
                     }];
 
-const questionsToAddRecord = (tableName) => {
-    return db.promise().query('DESCRIBE ' + tableName)
-        .then((results) => results[0])
-        .catch(console.error())
-        .then((columnsInfo) => {
-            const questions = [];
-            columnsInfo.forEach(columnInfo => {
-                
-                if (columnInfo.Extra !== 'auto_increment') {
-                    
-                    let question = {};
-                    const type = 'input';
-                    const message = `Please enter ${tableName}'s ${columnInfo.Field}`;
-                    const name = columnInfo.Field;
-                    const contentType = columnInfo.Type.toLowerCase();
-                    if (columnInfo.Type.toLowerCase() === 'int') {
-                        question = {
-                            type,
-                            message,
-                            name,
-                            validate(value) {
-                                const valid = !isNaN(parseInt(value));
-                                return valid || 'Please enter a number';
-                            },
-                        };
-                    } else if (contentType.substring(0, 7) === 'varchar') {
-                        const maxLength = parseInt(contentType.substring(8));
-                        question = {
-                            type,
-                            message,
-                            name,
-                            validate(value) {
-                                const valid = value.length <= maxLength;
-                                return valid || `Please enter no more than ${maxLength} characters`;
-                            },
-                        };
-                    } else {
-                        question = {
-                            type,
-                            message,
-                            name
-                        };
-                    }
-                    questions.push(question);
-                }
-            });
-            return questions;
-        });
-}
-
 const generateChoicesOfDepartment = () => {
     return getDepartments()
         .then(result => result.map(department => {
@@ -92,7 +41,8 @@ const generateQuestionToSelectDepartment = () => {
 
 const generateQuestionToSelectManager = () => {
     return generateChoicesOfManager()
-        .then(choices => generateListQuestions('manager', choices));
+        .then(choices => generateListQuestions('manager', choices))
+        .catch(err => console.log(err));
 }
 
 const generateChoicesOfRole = () => {
@@ -115,6 +65,59 @@ const generateChoicesOfManager = () => {
                     return choice
                 }))
                 .catch(err => console.log(err))
+}
+
+const generateChoicesOfEmployee = () => {
+    return getEmployees()
+                .then(result => result.map(employee => {
+                    let choice = {};
+                    choice.name = `${employee.title} ${employee.first_name} ${employee.last_name} in ${employee.department}`;
+                    choice.value = employee.id;
+                    return choice
+                }))
+                .catch(err => console.log(err))
+}
+
+const generateQuestionToSelectEmployee = () => {
+    return generateChoicesOfEmployee()
+        .then(choices => generateListQuestions('employee', choices))
+        .catch(err => console.log(err));
+}
+
+const generateQuestionToSelectRole = () => {
+    return generateChoicesOfRole()
+                .then(choices => generateListQuestions('role', choices))
+                .catch(err => console.log(err))
+}
+
+const generateQuestionsToUpdateRole = () => {
+    let questions = [];
+    return generateQuestionToSelectEmployee()
+                .then(question => {
+                    questions.push(question);
+                    return generateQuestionToSelectRole();
+                })
+                .catch(err => console.log(err))
+                .then(question => {
+                    questions.push(question);
+                    return questions;
+                })
+                .catch(err => console.log(err));
+}
+
+const generateQuestionsToUpdateManager = () => {
+    let questions = [];
+    return generateQuestionToSelectEmployee()
+                .then(question => {
+                    questions.push(question);
+                    return generateQuestionToSelectManager();
+                })
+                .catch(err => console.log(err))
+                .then(question => {
+                    questions.push(question);
+                    return questions;
+                })
+                .catch(err => console.log(err));
 }
 
 const generateCharInputQuestions = (tableName, columnName, maxLength) => {
@@ -208,39 +211,6 @@ const generateQuestionsToAddRole = () => {
 
 const generateQuestionToAddDepartment = () => [generateCharInputQuestions('department', 'name', 30)];
 
-const questionsToReadRecord = (tableName, column) => [{
-    type: "input",
-    message: `Please enter the ${column}_id`,
-    name: `${column}_id`,
-    validate(value) {
-        const valid =  !isNaN(parseInt(value));
-        return valid || 'Please enter a valid ID';
-    }
-}]
-
-const questionsToUpdateRecord = (tableName, column) => {
-    return [
-        {
-            type: 'input',
-            message: `Please enter ${tableName} id to update`,
-            name: 'id',
-            validate(value) {
-                const valid = !isNaN(parseInt(value));
-                return valid || 'Please enter a number';
-            }
-        },
-        {
-            type: 'input',
-            message: `Please enter ${column}_id to update`,
-            name: `${column}_id`,
-            validate(value) {
-                const valid = !isNaN(parseInt(value));
-                return valid || 'Please enter a number';
-            }
-        }
-    ];
-};
-
 const questionsToRemoveRecord = (tableName) => [{
     type: 'input',
     message: `Please enter ${tableName} id to delete`,
@@ -253,14 +223,13 @@ const questionsToRemoveRecord = (tableName) => [{
 
 module.exports = {
     questionsMenu,
-    questionsToAddRecord,
     generateQuestionToSelectDepartment,
     generateQuestionToSelectManager,
     generateQuestionsToAddEmloyee,
     generateQuestionsToAddRole,
     generateQuestionToAddDepartment,
-    questionsToReadRecord,
-    questionsToUpdateRecord,
+    generateQuestionsToUpdateRole,
+    generateQuestionsToUpdateManager,
     questionsToRemoveRecord
 };
 

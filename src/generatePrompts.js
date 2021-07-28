@@ -3,22 +3,14 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 
 const db = require('./connectDB');
-const { getEmployees, getEmployeesByDepartment, getEmployeesByManager, getRoles, getDepartments, addEmployee, addRole, addDepartment } = require('./dbOp');
-const { questionsMenu, questionsToAddRecord, generateQuestionToSelectDepartment, generateQuestionToSelectManager, generateQuestionsToAddEmloyee, generateQuestionsToAddRole, generateQuestionToAddDepartment, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
+const { getEmployees, getEmployeesByDepartment, getEmployeesByManager, getRoles, getDepartments, addEmployee, addRole, addDepartment, updateEmployeeRole, updateEmployeeManager } = require('./dbOp');
+const { questionsMenu, generateQuestionToSelectDepartment, generateQuestionToSelectManager, generateQuestionsToAddEmloyee, generateQuestionsToAddRole, generateQuestionToAddDepartment, generateQuestionsToUpdateRole, generateQuestionsToUpdateManager, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
     inquirer
         .prompt(questionsMenu)
         .then((answer) => {
-            const sqlDisplayEmployee = `SELECT a.id, a.first_name, a.last_name, role.title, CONCAT_WS(' ', b.first_name, b.last_name) AS 'manager', role.salary, department.name AS department
-                                        FROM employee a
-                                        LEFT JOIN role
-                                        ON a.role_id = role.id
-                                        LEFT JOIN employee b
-                                        ON a.manager_id = b.id
-                                        LEFT JOIN department
-                                        ON role.department_id = department.id`;
             switch (answer.todo) {
                 case 'View All Employees': {
                     getEmployees()
@@ -79,29 +71,21 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'Update An Employee Role': {
-                    inquirer.prompt(questionsToUpdateRecord('employee', 'role'))
-                        .then(answer => {
-                            const { id, role_id } = answer;
-                            const params = [role_id, id];
-                            const sql = `UPDATE employee
-                                         SET role_id = ?
-                                         WHERE id = ?;`
-                            return db.promise().query(sql, params);
-                        })
+                    generateQuestionsToUpdateRole()
+                        .then(questions => inquirer.prompt(questions))
+                        .catch(err => console.log(err))
+                        .then(answer => updateEmployeeRole(answer.role, answer.employee))
+                        .catch(err => console.log(err))
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
                     return;
                 }
                 case 'Update An Employee Manager': {
-                    inquirer.prompt(questionsToUpdateRecord('employee', 'manager'))
-                        .then(answer => {
-                            const { id, manager_id } = answer;
-                            const params = [manager_id, id];
-                            const sql = `UPDATE employee
-                                         SET manager_id = ?
-                                         WHERE id = ?;`;
-                            return db.promise().query(sql, params);
-                        })
+                    generateQuestionsToUpdateManager()
+                        .then(questions => inquirer.prompt(questions))
+                        .catch(err => console.log(err))
+                        .then(answer => updateEmployeeManager(answer.manager, answer.employee))
+                        .catch(err => console.log(err))
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
                     return;

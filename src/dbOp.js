@@ -64,6 +64,22 @@ const addEmployee = (firstName, lastName, roleId, managerId) => {
     return db.promise().query(sql, params);
 }
 
+const updateEmployeeRole = (roleId, employeeId) => {
+    const sql = `UPDATE employee
+                 SET role_id = ?
+                 WHERE id = ?`;
+    const params = [roleId, employeeId];
+    return db.promise().query(sql, params);
+}
+
+const updateEmployeeManager = (managerId, employeeId) => {
+    const sql = `UPDATE employee
+                 SET manager_id = ?
+                 WHERE id = ?`;
+    const params = [managerId, employeeId];
+    return db.promise().query(sql, params);
+}
+
 const addRole = (title, salary, department_id) => {
     const params = [title, salary, department_id];
     const sql = `INSERT INTO role (title, salary, department_id)
@@ -84,4 +100,6 @@ module.exports = {
     addEmployee,
     addRole,
     addDepartment,
+    updateEmployeeRole,
+    updateEmployeeManager
 };
