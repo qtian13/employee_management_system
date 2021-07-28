@@ -4,7 +4,7 @@ const cTable = require('console.table');
 
 const db = require('./connectDB');
 const { getEmployee, getRole, getDepartments, addDepartment } = require('./dbOp');
-const { questionsMenu, questionsToAddRecord, questionsToAddDepartment, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
+const { questionsMenu, questionsToAddRecord, generateQuestionsToAddRole, generateQuestionToAddDepartment, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
@@ -120,7 +120,7 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'Add A Role': {
-                    questionsToAddRecord('role')
+                    generateQuestionsToAddRole()
                         .then(questions => inquirer.prompt(questions))
                         .then(answer => {
                             const { title, salary, department_id } = answer;
@@ -132,6 +132,18 @@ const promptQuestions = () => {
                         .then(() => promptQuestions())
                         .catch(err => console.error(err));
                     return;
+                    // questionsToAddRecord('role')
+                    //     .then(questions => inquirer.prompt(questions))
+                    //     .then(answer => {
+                    //         const { title, salary, department_id } = answer;
+                    //         const params = [title, salary, department_id];
+                    //         const sql = `INSERT INTO role (title, salary, department_id)
+                    //         VALUES (?, ?, ?);`;
+                    //         return db.promise().query(sql, params);
+                    //     })
+                    //     .then(() => promptQuestions())
+                    //     .catch(err => console.error(err));
+                    // return;
                 }
                 case 'Remove A Role': {
                     inquirer.prompt(questionsToRemoveRecord('role'))
@@ -156,7 +168,7 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'Add A Department': {
-                    inquirer.prompt(questionsToAddDepartment)
+                    inquirer.prompt(generateQuestionToAddDepartment())
                         .then(answer => addDepartment(answer.name))
                         .catch(err => console.log(err))
                         .then(() => promptQuestions())

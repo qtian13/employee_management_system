@@ -1,4 +1,5 @@
 const { db } = require('../src/connectDB');
+const { getEmployee, getRole, getDepartments, addDepartment } = require('../src/dbOp');
 
 const options = ['View All Employees', 
                 'View All Employees By Department', 
@@ -73,16 +74,92 @@ const questionsToAddRecord = (tableName) => {
         });
 }
 
+const generateChoicesOfDepartment = () => {
+    return getDepartments()
+        .then(result => result.map(department => {
+            let choice = {};
+            choice.name = department.name;
+            choice.value = department.id;
+            return choice
+        }))
+        .catch(err => console.log(err))
+}
 
-questionsToAddDepartment = [{
-    type: 'input',
-    name: 'name',
-    message: 'Please enter the name of department you want to add',
-    validate(value) {
-        const valid = (value.trim().length <= 30);
-        return valid || `Please enter no more than 30 characters`;
-    }
-}];
+const generateCharInputQuestions = (tableName, columnName, maxLength) => {
+    const type = 'input';
+    const name = columnName;
+    const message = `Please enter the ${columnName} of ${tableName}`;
+    let question = {
+        type,
+        name,
+        message,
+        validate(value) {
+            const valid = (value.trim().length <= maxLength);
+            return valid || `Please enter no more than 30 characters`;
+        }
+    };
+    return question;
+}
+
+const generateIntInputQuestions = (tableName, columnName) => {
+    const type = 'input';
+    const name = columnName;
+    const message = `Please enter the ${columnName} of ${tableName}`;
+    let question = {
+        type,
+        name,
+        message,
+        validate(value) {
+            const valid = !isNaN(parseInt(value));
+            return valid || `Please enter an integer`;
+        }
+    };
+    return question;
+}
+
+
+const generateFloatInputQuestions = (tableName, columnName) => {
+    const type = 'input';
+    const name = columnName;
+    const message = `Please enter the ${columnName} of ${tableName}`;
+    let question = {
+        type,
+        name,
+        message,
+        validate(value) {
+            const valid = !isNaN(parseFloat(value));
+            return valid || `Please enter a float number`;
+        }
+    };
+    return question;
+}
+
+const generateListQuestions = (answerName, choices) => {
+    const type = 'list';
+    const name = answerName;
+    const message = `Please select the ${answerName}`;
+    let question = {
+        type,
+        name,
+        message,
+        choices
+    };
+    return question;
+}
+
+// generateChoicesOfDepartment().then(result => console.log(result));
+
+const generateQuestionsToAddRole = () => {
+    return generateChoicesOfDepartment()
+                .then(choices => [
+                                    generateCharInputQuestions('role', 'title', 30),
+                                    generateFloatInputQuestions('role', 'salary'),
+                                    generateListQuestions('department_id', choices)
+                                ])
+                .catch(err => console.log(err));
+};
+
+const generateQuestionToAddDepartment = () => [generateCharInputQuestions('department', 'name', 30)];
 
 const questionsToReadRecord = (tableName, column) => [{
     type: "input",
@@ -130,7 +207,8 @@ const questionsToRemoveRecord = (tableName) => [{
 module.exports = {
     questionsMenu,
     questionsToAddRecord,
-    questionsToAddDepartment,
+    generateQuestionsToAddRole,
+    generateQuestionToAddDepartment,
     questionsToReadRecord,
     questionsToUpdateRecord,
     questionsToRemoveRecord
