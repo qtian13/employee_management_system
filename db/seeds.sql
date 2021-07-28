@@ -1,16 +1,47 @@
 INSERT INTO department (name)
-VALUES ("software development"),
-       ("finance"),
-       ("Human Resource");
+VALUES ("Tech"),
+       ("Finance"),
+       ("Human Resource"),
+       ("Sales"),
+       ("Customer Support");
 
 INSERT INTO role (title, salary, department_id)
 VALUES ("manager", 150000, 1),
-       ("manager", 140000, 2),
-       ("manager", 130000, 3),
-       ("engineer", 120000, 1);
+       ("engineer", 150000, 1),
+       ("intern", 140000, 1),
+       ("manager", 130000, 2),
+       ("employee", 120000, 2),
+       ("intern", 150000, 2),
+       ("manager", 140000, 3),
+       ("employee", 130000, 3),
+       ("intern", 120000, 3),
+       ("manager", 150000, 4),
+       ("employee", 140000, 4),
+       ("intern", 130000, 4),
+       ("manager", 120000, 5),
+       ("employee", 140000, 5);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Er", "Gou", 1, NULL),
-       ("ha", "la", 4, 1),
-       ("Ha", "Ma", 4, 1),
-       ("siri", "Ma", 2, 1);
+VALUES ("Allen", "Li", 1, NULL),
+       ("Kevin", "Brown", 2, 1),
+       ("Sarah-Louise", "Obrien", 2, 1),
+       ("Marwan", "Ashley", 3, 1),
+       ("Chris", "Hull", 4, NULL),
+       ("Hamid", "Colley", 5, 5),
+       ("Akaash", "Zimmerman", 5, 5),
+       ("Ava-Grace", "Hanna", 6, 5),
+       ("Allen", "Li", 7, NULL),
+       ("Abdulrahman", "Kavanagh", 8, 9),
+       ("Charles", "Greig", 8, 9),
+       ("Aayat", "Gates", 9, 9),
+       ("Safia", "Mcintosh", 10, NULL),
+       ("Safiya", "Potts", 11, 13),
+       ("Israr", "Sheppard", 11, 13),
+       ("Penelope", "Davie", 12, 13),
+       ("Gregor", "Cruz", 13, Null),
+       ("Cadi", "Lynch", 14, 17),
+       ("Macauly", "Peralta", 14, 17),
+       ("Mikhail", "Andrew", 1, NULL),
+       ("Kelsea", "Acevedo", 2, 20),
+       ("Anabel", "Murillo", 2, 20),
+       ("Flora", "Ferguson", 3, 20);

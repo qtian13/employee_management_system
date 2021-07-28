@@ -12,8 +12,14 @@ This application is to create content management systems (CMS) that allows non-d
 * [Acknowledgments](#acknowledgments)
 
 ## Installation
-```console
+Log in to mysql to create the database
+```bash
 git clone https://github.com/qtian13/employee_management_system.git
+mysql -u root -p
+*******(password)
+SOURCE ./db/schema.sql
+SOURCE ./db/seeds.sql
+quit
 npm init -y
 npm i console.table
 npm i inquirer
@@ -24,6 +30,7 @@ node server.js
 * [JavaScript](https://www.javascript.com/)
 * [NodeJS](https://nodejs.org/en/)
 * [npm](https://www.npmjs.com/)
+* [mysql](https://www.mysql.com/)
 
 ## Features
 * User can view and manage the departments, roles, and employees in their company to organize and plan their business
@@ -40,11 +47,11 @@ node server.js
 * About role database
     * When user choose to `view all roles`, they are presented with the job title, role id, the department that role belongs to, and the salary for that role
     * When user choose to `add a role`, they are prompted to enter the name, salary and select a department for the role before this new role is added to the database
-    * When user choose to `remove a role`, then they are prompted to select a role to delete the role's data from in the database
+    * When user choose to `remove a role`, then they are prompted to select a role to delete the role's and related emloyees' data from in the database
 * About department database
     * When user choose to `view all departments`, they are presented with a formatted table showing department names and department ids
     * When user choose to `add a department`, they are prompted to enter the name of the department and that department is added to the database
-    * When user choose to `remove a department`, then they are prompted to select a department to delete the department's data from in the database
+    * When user choose to `remove a department`, then they are prompted to select a department to delete the department's and related roles and employees' data from in the database
 * About budget database
     * When user choose to `calculate utilized budget by department`, then they are presented with a formatted table showing department names and the combined salaries of all employees in that department
 
