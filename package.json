@@ -1,7 +1,7 @@
 {
   "name": "employee_management_system",
   "version": "1.0.0",
-  "description": "",
+  "description": "This application is to create content management systems (CMS) that allows non-developers to easily view and interact with information stored in databases to manage a company's employee database",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -22,5 +22,6 @@
     "console.table": "^0.10.0",
     "inquirer": "^8.1.2",
     "mysql2": "^2.2.5"
-  }
+  },
+  "devDependencies": {}
 }

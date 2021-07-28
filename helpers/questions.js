@@ -60,7 +60,7 @@ const generateChoicesOfManager = () => {
     return getManagers()
                 .then(result => result.map(manager => {
                     let choice = {};
-                    choice.name = manager.title + " " + manager.manager_name + " in " + manager.department;
+                    choice.name = manager.manager_name + " in " + manager.department;
                     choice.value = manager.id;
                     return choice
                 }))
