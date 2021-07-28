@@ -6,20 +6,20 @@ VALUES ("Tech"),
        ("Customer Support");
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("manager", 150000, 1),
-       ("engineer", 150000, 1),
-       ("intern", 140000, 1),
-       ("manager", 130000, 2),
-       ("employee", 120000, 2),
-       ("intern", 150000, 2),
-       ("manager", 140000, 3),
-       ("employee", 130000, 3),
-       ("intern", 120000, 3),
-       ("manager", 150000, 4),
-       ("employee", 140000, 4),
-       ("intern", 130000, 4),
-       ("manager", 120000, 5),
-       ("employee", 140000, 5);
+VALUES ("manager", 145000.00, 1),
+       ("engineer", 125000.00, 1),
+       ("intern", 105000.00, 1),
+       ("manager", 140000.00, 2),
+       ("employee", 120000.00, 2),
+       ("intern", 100000.00, 2),
+       ("manager", 140000.00, 3),
+       ("employee", 120000.00, 3),
+       ("intern", 100000.00, 3),
+       ("manager", 140000.00, 4),
+       ("employee", 120000.00, 4),
+       ("intern", 100000.00, 4),
+       ("manager", 140000.00, 5),
+       ("employee", 120000.00, 5);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Allen", "Li", 1, NULL),

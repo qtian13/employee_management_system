@@ -99,7 +99,7 @@ const promptQuestions = () => {
                     generateQuestionsToAddRole()
                         .then(questions => inquirer.prompt(questions))
                         .catch(err => console.log(err))
-                        .then(answer => addRole(answer.title, answer.salary, answer.department_id))
+                        .then(answer => addRole(answer.title, parseFloat(answer.salary).toFixed(2), answer.department_id))
                         .catch(err => console.error(err))
                         .then(() => promptQuestions())
                         .catch(err => console.error(err));
