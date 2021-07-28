@@ -30,7 +30,21 @@ const sqlAddDepartment = `INSERT INTO department (name) VALUES (?)`;
 const getEmployees = () => db.promise().query(sqlDisplayEmployee)
                             .then(results => results[0])
                             .catch(err => console.log(err));
-                        
+
+const getEmployeesByDepartment = (departmentId) => {
+    const sql = sqlDisplayEmployee + ' WHERE role.department_id = ?';
+    return db.promise().query(sql, [departmentId])
+                .then(results => results[0])
+                .catch(err => console.log(err));
+};
+
+const getEmployeesByManager = (managerId) => {
+    const sql = sqlDisplayEmployee + ' WHERE a.manager_id = ?';
+    return db.promise().query(sql, [managerId])
+                .then(results => results[0])
+                .catch(err => console.log(err));
+};
+
 const getManagers = () => db.promise().query(sqlGetManagers)
                             .then(results => results[0])
                             .catch(err => console.log(err));
@@ -62,6 +76,8 @@ const addDepartment = (name) => db.promise().query(sqlAddDepartment, [name])
 
 module.exports = {
     getEmployees,
+    getEmployeesByDepartment,
+    getEmployeesByManager,
     getManagers,
     getRoles,
     getDepartments,

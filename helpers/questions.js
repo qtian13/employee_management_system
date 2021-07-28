@@ -85,6 +85,16 @@ const generateChoicesOfDepartment = () => {
         .catch(err => console.log(err))
 }
 
+const generateQuestionToSelectDepartment = () => {
+    return generateChoicesOfDepartment()
+        .then(choices => generateListQuestions('department', choices));
+}
+
+const generateQuestionToSelectManager = () => {
+    return generateChoicesOfManager()
+        .then(choices => generateListQuestions('manager', choices));
+}
+
 const generateChoicesOfRole = () => {
     return getRoles()
         .then(result => result.map(role => {
@@ -244,6 +254,8 @@ const questionsToRemoveRecord = (tableName) => [{
 module.exports = {
     questionsMenu,
     questionsToAddRecord,
+    generateQuestionToSelectDepartment,
+    generateQuestionToSelectManager,
     generateQuestionsToAddEmloyee,
     generateQuestionsToAddRole,
     generateQuestionToAddDepartment,

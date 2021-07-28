@@ -3,8 +3,8 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 
 const db = require('./connectDB');
-const { getEmployees, getRoles, getDepartments, addEmployee, addRole, addDepartment } = require('./dbOp');
-const { questionsMenu, questionsToAddRecord, generateQuestionsToAddEmloyee, generateQuestionsToAddRole, generateQuestionToAddDepartment, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
+const { getEmployees, getEmployeesByDepartment, getEmployeesByManager, getRoles, getDepartments, addEmployee, addRole, addDepartment } = require('./dbOp');
+const { questionsMenu, questionsToAddRecord, generateQuestionToSelectDepartment, generateQuestionToSelectManager, generateQuestionsToAddEmloyee, generateQuestionsToAddRole, generateQuestionToAddDepartment, questionsToReadRecord, questionsToUpdateRecord, questionsToRemoveRecord} = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
@@ -30,26 +30,26 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'View All Employees By Department': {
-                    inquirer.prompt(questionsToReadRecord('employee', 'department'))
-                        .then(answer => {
-                            const sql = sqlDisplayEmployee + ` WHERE role.department_id = ?`;
-                            return db.promise().query(sql, [answer.department_id]);
-                        })
+                    generateQuestionToSelectDepartment()
+                        .then(question => inquirer.prompt([question]))
+                        .catch(err => console.log(err))
+                        .then(answer => getEmployeesByDepartment(answer.department))
+                        .catch(err => console.log(err))
                         .then(results => {
-                            console.table(results[0]);
+                            console.table(results);
                             promptQuestions();
                         })
                         .catch(err => console.log(err));
                     return;
                 }
                 case 'View All Employees By Manager': {
-                    inquirer.prompt(questionsToReadRecord('employee', 'manager'))
-                        .then(answer => {
-                            const sql = sqlDisplayEmployee + ` WHERE a.manager_id = ?`;
-                            return db.promise().query(sql, [answer.manager_id]);
-                        })
+                    generateQuestionToSelectManager()
+                        .then(question => inquirer.prompt([question]))
+                        .catch(err => console.log(err))
+                        .then(answer => getEmployeesByManager(answer.manager))
+                        .catch(err => console.log(err))
                         .then(results => {
-                            console.table(results[0]);
+                            console.table(results);
                             promptQuestions();
                         })
                         .catch(err => console.log(err));
