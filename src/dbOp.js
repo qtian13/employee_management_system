@@ -80,6 +80,24 @@ const updateEmployeeManager = (managerId, employeeId) => {
     return db.promise().query(sql, params);
 }
 
+const removeEmployee = (employeeId) => {
+    const sql = `DELETE FROM employee WHERE id = ?`;
+    const params = [employeeId];
+    return db.promise().query(sql, params);
+}
+
+const removeRole = (roleId) => {
+    const sql = `DELETE FROM role WHERE id = ?`;
+    const params = [roleId];
+    return db.promise().query(sql, params);
+}
+
+const removeDepartment = (departmentId) => {
+    const sql = `DELETE FROM department WHERE id = ?`;
+    const params = [departmentId];
+    return db.promise().query(sql, params);
+}
+
 const addRole = (title, salary, department_id) => {
     const params = [title, salary, department_id];
     const sql = `INSERT INTO role (title, salary, department_id)
@@ -101,5 +119,8 @@ module.exports = {
     addRole,
     addDepartment,
     updateEmployeeRole,
-    updateEmployeeManager
+    updateEmployeeManager,
+    removeEmployee,
+    removeRole,
+    removeDepartment
 };

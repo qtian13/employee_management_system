@@ -225,11 +225,13 @@ module.exports = {
     questionsMenu,
     generateQuestionToSelectDepartment,
     generateQuestionToSelectManager,
+    generateQuestionToSelectEmployee,
+    generateQuestionToSelectRole,
+    generateQuestionToSelectDepartment,
     generateQuestionsToAddEmloyee,
     generateQuestionsToAddRole,
     generateQuestionToAddDepartment,
     generateQuestionsToUpdateRole,
     generateQuestionsToUpdateManager,
-    questionsToRemoveRecord
 };
 

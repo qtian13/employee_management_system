@@ -3,8 +3,8 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 
 const db = require('./connectDB');
-const { getEmployees, getEmployeesByDepartment, getEmployeesByManager, getRoles, getDepartments, addEmployee, addRole, addDepartment, updateEmployeeRole, updateEmployeeManager } = require('./dbOp');
-const { questionsMenu, generateQuestionToSelectDepartment, generateQuestionToSelectManager, generateQuestionsToAddEmloyee, generateQuestionsToAddRole, generateQuestionToAddDepartment, generateQuestionsToUpdateRole, generateQuestionsToUpdateManager, questionsToRemoveRecord} = require('../helpers/questions');
+const { getEmployees, getEmployeesByDepartment, getEmployeesByManager, getRoles, getDepartments, addEmployee, addRole, addDepartment, updateEmployeeRole, updateEmployeeManager, removeEmployee, removeRole, removeDepartment } = require('./dbOp');
+const { questionsMenu, generateQuestionToSelectDepartment, generateQuestionToSelectManager, generateQuestionToSelectEmployee, generateQuestionToSelectRole, generateQuestionsToAddEmloyee, generateQuestionsToAddRole, generateQuestionToAddDepartment, generateQuestionsToUpdateRole, generateQuestionsToUpdateManager } = require('../helpers/questions');
 const { throwError } = require('rxjs');
 
 const promptQuestions = () => {
@@ -58,14 +58,11 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'Remove An Employee': {
-                    inquirer.prompt(questionsToRemoveRecord('employee'))
-                        .then(answer => {
-                            const { id } = answer;
-                            const params = [id];
-                            const sql = `DELETE FROM employee
-                                         WHERE id = ?;`;
-                            return db.promise().query(sql, params);
-                        })
+                    generateQuestionToSelectEmployee()
+                        .then(question => inquirer.prompt([question]))
+                        .catch(err => console.log(err))
+                        .then(answer => removeEmployee(answer.employee))
+                        .catch(err => console.log(err))
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
                     return;
@@ -102,6 +99,7 @@ const promptQuestions = () => {
                 case 'Add A Role': {
                     generateQuestionsToAddRole()
                         .then(questions => inquirer.prompt(questions))
+                        .catch(err => console.log(err))
                         .then(answer => addRole(answer.title, answer.salary, answer.department_id))
                         .catch(err => console.error(err))
                         .then(() => promptQuestions())
@@ -109,14 +107,11 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'Remove A Role': {
-                    inquirer.prompt(questionsToRemoveRecord('role'))
-                        .then(answer => {
-                            const { id } = answer;
-                            const params = [id];
-                            const sql = `DELETE FROM role
-                                         WHERE id = ?;`;
-                            return db.promise().query(sql, params);
-                        })
+                    generateQuestionToSelectRole()
+                        .then(question => inquirer.prompt([question]))
+                        .catch(err => console.log(err))
+                        .then(answer => removeRole(answer.role))
+                        .catch(err => console.log(err))
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
                     return;
@@ -139,14 +134,11 @@ const promptQuestions = () => {
                     return;
                 }
                 case 'Remove A Department': {
-                    inquirer.prompt(questionsToRemoveRecord('department'))
-                        .then(answer => {
-                            const { id } = answer;
-                            const params = [id];
-                            const sql = `DELETE FROM department
-                                         WHERE id = ?;`;
-                            return db.promise().query(sql, params);
-                        })
+                    generateQuestionToSelectDepartment()
+                        .then(question => inquirer.prompt([question]))
+                        .catch(err => console.log(err))
+                        .then(answer => removeDepartment(answer.department))
+                        .catch(err => console.log(err))
                         .then(() => promptQuestions())
                         .catch(err => console.log(err));
                     return;
