@@ -23,6 +23,9 @@ const questionsMenu = [{
                         name: 'todo'
                     }];
 
+// get data about department and use array map to create the choices array
+// the department name is displayed to user to choose
+// the value hold the department primary key department_id to specify a certain department
 const generateChoicesOfDepartment = () => {
     return getDepartments()
         .then(result => result.map(department => {
@@ -34,17 +37,22 @@ const generateChoicesOfDepartment = () => {
         .catch(err => console.log(err))
 }
 
+// generate a list question for user to select department
 const generateQuestionToSelectDepartment = () => {
     return generateChoicesOfDepartment()
         .then(choices => generateListQuestions('department', choices));
 }
 
+// generate a list question for user to select manager
 const generateQuestionToSelectManager = () => {
     return generateChoicesOfManager()
         .then(choices => generateListQuestions('manager', choices))
         .catch(err => console.log(err));
 }
 
+// get data about role and use array map to create the choices array
+// the role title and department name is displayed to user to choose
+// the value hold the role primary key id to specify a certain role
 const generateChoicesOfRole = () => {
     return getRoles()
         .then(result => result.map(role => {
