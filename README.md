@@ -6,7 +6,6 @@ This application is to create content management systems (CMS) that allows non-d
 * [Built With](#built-with)
 * [Features](#features)
 * [Demo Video](#demo-video)
-* [Demo GIF](#demo-gif)
 * [Author](#author)
 * [Questions](#questions)
 * [Acknowledgments](#acknowledgments)
