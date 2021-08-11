@@ -1,4 +1,7 @@
 # Employee Management System
+
+[![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 This application is to create content management systems (CMS) that allows non-developers to easily view and interact with information stored in databases to manage a company's employee database
 
 ## Table of Contents
@@ -60,7 +63,7 @@ Demo Video: [https://drive.google.com/file/d/19GtsURt03ByBzXXQ0JVBvYKpxrl3XwMY/v
 
 ## Author
 Qiushuang Tian
-- [Link to Portfolio Site](https://qtian13.github.io/myPortfolio/)
+- [Link to Portfolio Site](https://qtian13.github.io/portfolioUpdate/)
 - [Link to Github](https://github.com/qtian13)
 - [Link to LinkedIn](https://www.linkedin.com/in/qiushuang-tian-a9754248/)
 
